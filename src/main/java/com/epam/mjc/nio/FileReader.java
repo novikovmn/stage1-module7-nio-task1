@@ -1,9 +1,11 @@
 package com.epam.mjc.nio;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -11,15 +13,23 @@ public class FileReader {
 
     public Profile getDataFromFile(File file) {
     	Profile profile = new Profile();
-    	try {
-			Path path = file.toPath();
-			List<String> lines = Files.readAllLines(path);
-			profile = constructProfile(lines);
-		} catch (IOException e) {
+    	Path path = file.toPath();    	
+    	try(BufferedReader br = Files.newBufferedReader(path)){
+    		List<String> lines = fetchLines(br);
+    		profile = constructProfile(lines);
+    	} catch (IOException e) {
 			e.printStackTrace();
-		}
-    	
+		}    	
         return profile;
+    }
+    
+    private List<String> fetchLines(BufferedReader br) throws IOException{
+    	List<String> lines = new ArrayList<>();
+    	while(br.ready()) {
+    		String theLine = br.readLine();
+    		lines.add(theLine);
+    	}		
+    	return lines;
     }
     
     private Profile constructProfile(List<String> lines) {
